@@ -24,126 +24,142 @@ Loop1: #loop until player enters valid input or next turn
 li $v0, 5 #wait for player to choose where to play
 syscall
 
-add $s0, $v0, $zero
-addi $t0, $zero, 1
-addi $t3, $t3, 7
-slt $t1, $s0, $t0
+#error check to make sure that the player has entered a valid number
+#if number is greater than or less than the number of columns print error
+add $s0, $v0, $zero #$s0 now holds what the player entered
+addi $t0, $zero, 1 #minimun number that can to be entered
+addi $t3, $zero, 7 #max number that can to be entered
+slt $t1, $s0, $t0 #check greater than min
 beq $t1, $zero, Lab1
 la $a0, errorMessage #print error message
 li $v0, 4
 syscall
-j Loop1
-Lab1:
-sgt $t1, $s0, $t3
+j Loop1 #go back to player prompt to let player try entering another value
+Lab1: 
+sgt $t1, $s0, $t3 #check less than max
 beq $t1, $zero, Lab2
 la $a0, errorMessage #print error message
 li $v0, 4
 syscall
-j Loop1
+j Loop1 #go back to player prompt to let player try entering another value
 Lab2:
 
-addi $t7, $t7, 7
+addi $t7, $t7, 7 #register that holds the total # of columns
 addi $s2, $zero, 1 # value of player space
 addi $s3, $zero, 2 #value of computer space
 
 
 addi $s6, $zero, 6
 addi $s7, $zero, 5
-FindColumn:
-addi $t0, $zero, 1
+add $a0, $zero, $s0 #put input value into argument to pass to subrouting
+jal FindColumn #value will be returned in $v1
+add $s5, $zero, $v1 #move returned value to $s5
 
-bne $s0, $t0, L2
-la $s5, col1
-
-L2: addi $t0, $t0, 1
-bne $s0, $t0 , L3
-la $s5, col2
-
-L3: addi $t0, $t0, 1
-bne $s0, $t0 , L4
-la $s5, col3
-
-L4: addi $t0, $t0, 1
-bne $s0, $t0 , L5
-la $s5, col4
-
-L5: addi $t0, $t0, 1
-bne $s0, $t0 , L6
-la $s5, col5
-
-L6: addi $t0, $t0, 1
-bne $s0, $t0 , L7
-la $s5, col6
-
-L7: addi $t0, $t0, 1
-bne $s0, $t0 , L8
-la $s5, col7
-
-L8:
 add $t3, $zero, $zero
 
-bne $t9, $zero, PrintReturn
+#bne $t9, $zero, PrintReturn
 
-Loop2:
-sll $t3, $t3, 2
-add $t4, $t3, $s5
-lw $t5, 0($t4)
-bne $t5, $zero, Lab4
-srl $t3, $t3, 2
-addi $t3, $t3, 1
-sgt $t6, $t3, $s7
+Loop2:#check to find an empty row in the chosen column
+sll $t3, $t3, 2 #times 4 so word aligned
+add $t4, $t3, $s5 #added to column starting address
+lw $t5, 0($t4) #get the value at new address
+bne $t5, $zero, Lab4 #check to see if its empty by checking if its equal to 0
+srl $t3, $t3, 2 #divide by 4
+addi $t3, $t3, 1 
+sgt $t6, $t3, $s7 #check to make sure it has not gone over the number of rows
 bne $t6, $zero, Lab3
 j Loop2
 
-Lab4:
-srl $t3, $t3, 2
+Lab4: # value of space was not 0, so there was a piece in that column
+srl $t3, $t3, 2 #divide by 4
 
-
+#found the lowest empty row in the chosen column
 Lab3:
-subi $t3, $t3, 1
-sll $t3, $t3, 2
-add $t4, $t3, $s5
-sw $s2, 0($t4)
+subi $t3, $t3, 1 #subtract 1, because piece will need to be placed on top of other pieces
+sll $t3, $t3, 2 #times 4 so word aligned
+add $t4, $t3, $s5 #add the row offset to the address of the array for the column
+sw $s2, 0($t4) #store the value of a player piece at this location
 
-add $s0, $zero, $zero
-add $t8, $zero, $zero
+add $s0, $zero, $zero  #reset register for player input
+add $t8, $zero, $zero #t8 holds the staring row for printing
 addi $t9,$zero, 1
+
+#print the board: goes through arrays for the column and prints the characters for player,
+#opponent or empty spaces depending on the value. Needs to be printed row by row. so need 
+#to get the first values of each column, and then the second values of each column, etc.
 Print:
 
-addi $s0, $s0, 1 
-j FindColumn
-PrintReturn:
+addi $s0, $s0, 1  #start $s0 at 1, to start printing the first column
+add $a0, $s0, $zero #move to arguments to pass to subroutine
+jal FindColumn 
+add $s5, $v1, $zero #move returned value to $s5
+
 PrintLoop:
-#sll $t8, $t8, 2
-add $t4, $s5, $t8
-lw $t5, 0($t4)
-bne $t5, $zero, P1
+add $t4, $s5, $t8 # add row offset to staring address of column array
+lw $t5, 0($t4) #get the value at this address
+bne $t5, $zero, P1 # if it is equal to 0 it is empty space so print empty space char
 la $a0, emptySpace
 li $v0, 4
 syscall
-P1: bne $t5, $s2, P2
+P1: bne $t5, $s2, P2 #if it is equal to 1 it is a player space, so print the correct char
 la $a0, playerSpace
 li $v0, 4
 syscall
-P2: bne $t5, $s3, P3
+P2: bne $t5, $s3, P3 # if it is equal to 2 it is a opponent space, so print the correct char
 la $a0, computerSpace
 li $v0, 4
 syscall
 P3:
-sgt $t6, $s0, $s6
-bne $t6, $zero, PrintUpdate
-add $t5, $zero, $zero
+sgt $t6, $s0, $s6 #check to see if the whole column has been printed yet
+bne $t6, $zero, PrintUpdate #update the row all of the current row has been printed
+add $t5, $zero, $zero #if not all columns printed, continue printing current row
 j Print
 PrintUpdate:
-#srl $t8, $t8, 2
-addi $t8, $t8, 4
+addi $t8, $t8, 4 #update row for next row
 srl $t5, $t8, 2
-sgt $t6, $t5, $s7
-la $a0, newLine
+sgt $t6, $t5, $s7 #make sure max rows is not passed
+la $a0, newLine #print a new line character after each row to make it look like a board
 li $v0, 4
 syscall
-add $s0, $zero, $zero
-bne $t6, $zero, PrintEnd
+add $s0, $zero, $zero # reset to first column
+bne $t6, $zero, PrintEnd #if max rows is passed the entire board is printed
 j Print
 PrintEnd:
-j Loop3
+j Loop3 #loop back to let the player take another turn
+
+
+#find the starting address of the array for the chosen column
+#$t0 will get incremented until it matches the number entered
+#once it matches the address of the chosen column will be loaded into $s5
+FindColumn:
+addi $t0, $zero, 1 
+
+bne $a0, $t0, L2
+la $v1, col1
+
+L2: addi $t0, $t0, 1
+bne $a0, $t0 , L3
+la $v1, col2
+
+L3: addi $t0, $t0, 1
+bne $a0, $t0 , L4
+la $v1, col3
+
+L4: addi $t0, $t0, 1
+bne $a0, $t0 , L5
+la $v1, col4
+
+L5: addi $t0, $t0, 1
+bne $a0, $t0 , L6
+la $v1, col5
+
+L6: addi $t0, $t0, 1
+bne $a0, $t0 , L7
+la $v1, col6
+
+L7: addi $t0, $t0, 1
+bne $a0, $t0 , L8
+la $v1, col7
+
+L8:
+jr $ra
