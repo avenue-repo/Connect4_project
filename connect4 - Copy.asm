@@ -47,6 +47,7 @@ Lab2:
 addi $t7, $t7, 7 #register that holds the total # of columns
 addi $s2, $zero, 1 # value of player space
 addi $s3, $zero, 2 #value of computer space
+addi $s1, $zero, 1	#Value of player turn (computer:1, player:0)
 
 
 addi $s6, $zero, 6
@@ -78,8 +79,13 @@ Lab3:
 subi $t3, $t3, 1 #subtract 1, because piece will need to be placed on top of other pieces
 sll $t3, $t3, 2 #times 4 so word aligned
 add $t4, $t3, $s5 #add the row offset to the address of the array for the column
+beq $s1, $zero, L10		#If $s1 is 1 then sets the space to computer player space
 sw $s2, 0($t4) #store the value of a player piece at this location
+j skip
+L10:
+sw $s3, 0($t4)
 
+skip:
 add $s0, $zero, $zero  #reset register for player input
 add $t8, $zero, $zero #t8 holds the staring row for printing
 addi $t9,$zero, 1
@@ -125,7 +131,14 @@ add $s0, $zero, $zero # reset to first column
 bne $t6, $zero, PrintEnd #if max rows is passed the entire board is printed
 j Print
 PrintEnd:
-j Loop3 #loop back to let the player take another turn
+la $a0, newLine #print a new line character after the ascii board prints to differentiate between turns
+li $v0, 4
+syscall
+
+beq $s1, $zero, L9		#Tests whose turn it is
+j ComputerLoop 	#Loops to computer turn if $s1 is 1
+L9:				#Loop to let the player take a turn if $s1 is 0
+j Loop3
 
 
 #find the starting address of the array for the chosen column
@@ -163,3 +176,22 @@ la $v1, col7
 
 L8:
 jr $ra
+
+ComputerLoop:			#Generates random number to calculate computer column	
+addi $t0, $zero, 1		#initializes $t0 to 1
+addi $a1, $zero, 7		#upperbound of random number
+addi $v0, $zero, 42
+syscall				#generates number from 0-6 and stores in $a0
+addi $a0, $a0, 1		#Sets the lower bound to 1 and upper bound to 8
+
+#addi $v0, $zero, 1
+#syscall
+
+jal FindColumn #value will be returned in $v1
+add $s5, $zero, $v1 #move returned value to $s5
+add $t3, $zero, $zero
+addi $s1, $zero, 0		#sets the player turn to player
+j Loop2
+
+
+
