@@ -16,8 +16,8 @@ newLine: .asciiz "\n"
 p1Winner: .asciiz "Player 1 won the game!"
 p2Winner: .asciiz "Player 2 won the game!"
 tie: .asciiz "Tied Game!"
-.text
 
+.text
 Loop3:
 add $t9, $zero, $zero
 add $v0, $zero, $zero
@@ -46,9 +46,8 @@ la $a0, errorMessage #print error message
 li $v0, 4
 syscall
 j Loop1 #go back to player prompt to let player try entering another value
+Lab2:
 
-
-Lab2: # made a valid move 
 addi $t7, $t7, 7 #register that holds the total # of columns
 addi $s2, $zero, 1 # value of player space
 addi $s3, $zero, 2 #value of computer space
@@ -120,13 +119,11 @@ P2: bne $t5, $s3, P3 # if it is equal to 2 it is a opponent space, so print the 
 la $a0, computerSpace
 li $v0, 4
 syscall
-
 P3:
 sgt $t6, $s0, $s6 #check to see if the whole column has been printed yet
 bne $t6, $zero, PrintUpdate #update the row all of the current row has been printed
 add $t5, $zero, $zero #if not all columns printed, continue printing current row
 j Print
-
 PrintUpdate:
 addi $t8, $t8, 4 #update row for next row
 srl $t5, $t8, 2
@@ -137,7 +134,6 @@ syscall
 add $s0, $zero, $zero # reset to first column
 bne $t6, $zero, PrintEnd #if max rows is passed the entire board is printed
 j Print
-
 PrintEnd:
 la $a0, newLine #print a new line character after the ascii board prints to differentiate between turns
 li $v0, 4
@@ -192,12 +188,14 @@ addi $v0, $zero, 42
 syscall				#generates number from 0-6 and stores in $a0
 addi $a0, $a0, 1		#Sets the lower bound to 1 and upper bound to 8
 
+#addi $v0, $zero, 1
+#syscall
+
 jal FindColumn #value will be returned in $v1
 add $s5, $zero, $v1 #move returned value to $s5
 add $t3, $zero, $zero
 addi $s1, $zero, 0		#sets the player turn to player
 j Loop2
-
 
 CheckWinner:
 # check for 4 in a row
@@ -232,4 +230,3 @@ syscall
 
 
 
- 	
