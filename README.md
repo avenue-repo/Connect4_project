@@ -9,6 +9,6 @@ Here are the specs for this game:
 - Winner of the game is determined according to the rules of the game. 
 
 Contributers: 
-- Avery Arnold[https://github.com/avenue-repo]
-- Yara Jandal[https://github.com/YaraJan]
-- Tasnim Mahi[https://github.com/mahimahithefish]
+- [Avery Arnold](https://github.com/avenue-repo)
+- [Yara Jandal](https://github.com/YaraJan)
+- [Tasnim Mahi](https://github.com/mahimahithefish)
