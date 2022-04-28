@@ -1,4 +1,6 @@
 #connect 4 program
+.include "board.asm"
+
 .data
 col1: .word 0, 0, 0, 0, 0, 0
 col2: .word 0, 0, 0, 0, 0, 0
@@ -7,6 +9,7 @@ col4: .word 0, 0, 0, 0, 0, 0
 col5: .word 0, 0, 0, 0, 0, 0
 col6: .word 0, 0, 0, 0, 0, 0
 col7: .word 0, 0, 0, 0, 0, 0
+
 # total number of spaces is 42
 playerPrompt: .asciiz "Where would you like to play your piece? Pick a column 1-7. "
 errorMessage: .asciiz "Input is not in range of the number of columns. Enter an integer between 1-7. "
@@ -21,6 +24,9 @@ p2Winner: .asciiz "Player 2 won the game!"
 tie: .asciiz "Tied Game!"
 count: .word 0 #keeps count of how many moves made
 .text
+.globl main
+
+main:
 lw $s4, count
 Loop3:
 add $t9, $zero, $zero
