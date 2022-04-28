@@ -3,11 +3,6 @@
 playerPrompt: .asciiz "Where would you like to play your piece? Pick a column 1-7. "
 errorMessage: .asciiz "Input is not in range of the number of columns. Enter an integer between 1-7. "
 fullColumn: .asciiz "The column you chose is full. Pick a different column."
-emptySpace: .asciiz " _ "
-playerSpace: .asciiz " X "
-computerSpace: .asciiz " 0 "
-wall: .asciiz "|"
-newLine: .asciiz "\n"
 p1Winner: .asciiz "Player 1 won the game!"
 p2Winner: .asciiz "Player 2 won the game!"
 tie: .asciiz "Tied Game!"
@@ -287,61 +282,7 @@ add $s0, $zero, $zero  #reset register for player input
 add $t8, $zero, $zero #t8 holds the starting row for printing
 addi $t9,$zero, 1
 
-#print the board: goes through arrays for the column and prints the characters for player,
-#opponent or empty spaces depending on the value. Needs to be printed row by row. so need 
-#to get the first values of each column, and then the second values of each column, etc.
-Print:
-addi $s0, $s0, 1  #start $s0 at 1, to start printing the first column
-add $a0, $s0, $zero #move to arguments to pass to subroutine
-jal FindColumn 
-add $s5, $v1, $zero #move returned value to $s5
-
-PrintLoop:
-add $t4, $s5, $t8 # add row offset to staring address of column array
-lw $t5, 0($t4) #get the value at this address
-
-la $a0, wall #print the wall between the spaces
-li $v0, 4
-syscall
-
-bne $t5, $zero, P1 # if it is equal to 0 it is empty space so print empty space char
-la $a0, emptySpace
-li $v0, 4
-syscall
-
-P1: bne $t5, $s2, P2 #if it is equal to 1 it is a player space, so print the correct char
-la $a0, playerSpace
-li $v0, 4
-syscall
-P2: bne $t5, $s3, P3 # if it is equal to 2 it is a opponent space, so print the correct char
-la $a0, computerSpace
-li $v0, 4
-syscall
-P3:
-sgt $t6, $s0, $s6 #check to see if the whole column has been printed yet
-bne $t6, $zero, PrintUpdate #update the row all of the current row has been printed
-add $t5, $zero, $zero #if not all columns printed, continue printing current row
-j Print
-
-PrintUpdate:
-addi $t8, $t8, 4 #update row for next row
-srl $t5, $t8, 2
-sgt $t6, $t5, $s7 #make sure max rows is not passed
-
-la $a0, wall #print the last wall for the column
-li $v0, 4
-syscall
-
-la $a0, newLine #print a new line character after each row to make it look like a board
-li $v0, 4
-syscall
-add $s0, $zero, $zero # reset to first column
-bne $t6, $zero, PrintEnd #if max rows is passed the entire board is printed
-j Print
-PrintEnd:
-la $a0, newLine #print a new line character after the ascii board prints to differentiate between turns
-li $v0, 4
-syscall
+.include "PrintBoard.asm"		#Links to module to print the board
 
 addi $t1, $zero, 4
 beq $t2, $t1, chooseWinner #if 4 in a row, last print so choose winner
