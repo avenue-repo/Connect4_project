@@ -1,13 +1,5 @@
 #connect 4 program
 .data
-col1: .word 0, 0, 0, 0, 0, 0
-col2: .word 0, 0, 0, 0, 0, 0
-col3: .word 0, 0, 0, 0, 0, 0
-col4: .word 0, 0, 0, 0, 0, 0
-col5: .word 0, 0, 0, 0, 0, 0
-col6: .word 0, 0, 0, 0, 0, 0
-col7: .word 0, 0, 0, 0, 0, 0
-# total number of spaces is 42
 playerPrompt: .asciiz "Where would you like to play your piece? Pick a column 1-7. "
 errorMessage: .asciiz "Input is not in range of the number of columns. Enter an integer between 1-7. "
 fullColumn: .asciiz "The column you chose is full. Pick a different column."
@@ -362,9 +354,6 @@ beq $s1, $zero, L9		#Tests whose turn it is
 j ComputerLoop 	#Loops to computer turn if $s1 is 1
 L9:				#Loop to let the player take a turn if $s1 is 0
 j Loop3
-
-#TEST
-
 
 ComputerLoop:			#Generates random number to calculate computer column	
 newColumn:
