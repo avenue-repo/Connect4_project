@@ -20,8 +20,13 @@ p1Winner: .asciiz "Player 1 won the game!"
 p2Winner: .asciiz "Player 2 won the game!"
 tie: .asciiz "Tied Game!"
 count: .word 0 #keeps count of how many moves made
+
 .text
+.globl main
+
+main:
 lw $s4, count
+
 Loop3:
 add $t9, $zero, $zero
 add $v0, $zero, $zero
@@ -358,42 +363,8 @@ j ComputerLoop 	#Loops to computer turn if $s1 is 1
 L9:				#Loop to let the player take a turn if $s1 is 0
 j Loop3
 
+#TEST
 
-#find the starting address of the array for the chosen column
-#$t0 will get incremented until it matches the number entered
-#once it matches the address of the chosen column will be loaded into $s5
-FindColumn:
-addi $t0, $zero, 1 
-
-bne $a0, $t0, L2
-la $v1, col1
-
-L2: addi $t0, $t0, 1
-bne $a0, $t0 , L3
-la $v1, col2
-
-L3: addi $t0, $t0, 1
-bne $a0, $t0 , L4
-la $v1, col3
-
-L4: addi $t0, $t0, 1
-bne $a0, $t0 , L5
-la $v1, col4
-
-L5: addi $t0, $t0, 1
-bne $a0, $t0 , L6
-la $v1, col5
-
-L6: addi $t0, $t0, 1
-bne $a0, $t0 , L7
-la $v1, col6
-
-L7: addi $t0, $t0, 1
-bne $a0, $t0 , L8
-la $v1, col7
-
-L8:
-jr $ra
 
 ComputerLoop:			#Generates random number to calculate computer column	
 newColumn:
