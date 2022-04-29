@@ -3,7 +3,6 @@
 playerPrompt: .asciiz "Where would you like to play your piece? Pick a column 1-7. "
 errorMessage: .asciiz "Input is not in range of the number of columns. Enter an integer between 1-7. "
 fullColumn: .asciiz "The column you chose is full. Pick a different column."
-
 count: .word 0 #keeps count of how many moves made
 
 .text
@@ -68,8 +67,6 @@ add $s5, $zero, $v1 #move returned value to $s5
 
 add $t3, $zero, $zero
 
-#bne $t9, $zero, PrintReturn
-
 Loop2:#check to find an empty row in the chosen column
 sll $t3, $t3, 2 #times 4 so word aligned
 add $t4, $t3, $s5 #added to column starting address
@@ -86,7 +83,6 @@ srl $t3, $t3, 2 #divide by 4
 
 #found the lowest empty row in the chosen column
 # here player can make the move 
-#addi $s4, $s4, 1 #incrementing the counter 
 Lab3:
 subi $t3, $t3, 1 #subtract 1, because piece will need to be placed on top of other pieces
 sll $t3, $t3, 2 #times 4 so word aligned
@@ -134,6 +130,5 @@ addi $s1, $zero, 0		#sets the player turn to player
 add $s0, $a0, $zero
 j Loop2
 
-#TEST
 .include "ChooseWinner.asm"		#Links to file to choose which player won
 

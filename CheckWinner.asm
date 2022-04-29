@@ -187,4 +187,3 @@ done:
 add $s0, $zero, $zero  #reset register for player input
 add $t8, $zero, $zero #t8 holds the starting row for printing
 addi $t9,$zero, 1
-
