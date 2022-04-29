@@ -3,9 +3,7 @@
 playerPrompt: .asciiz "Where would you like to play your piece? Pick a column 1-7. "
 errorMessage: .asciiz "Input is not in range of the number of columns. Enter an integer between 1-7. "
 fullColumn: .asciiz "The column you chose is full. Pick a different column."
-p1Winner: .asciiz "Player 1 won the game!"
-p2Winner: .asciiz "Player 2 won the game!"
-tie: .asciiz "Tied Game!"
+
 count: .word 0 #keeps count of how many moves made
 
 .text
@@ -102,10 +100,9 @@ sw $s3, 0($t4)  #store the value of a player piece
 addi $s4, $s4, 1
 
 skip:
-.include "CheckWinner.asm"
-#TEST1
+.include "CheckWinner.asm"		#Links to file that checks the win conditions
 
-.include "PrintBoard.asm"		#Links to module to print the board
+.include "PrintBoard.asm"		#Links to file to print the board
 
 addi $t1, $zero, 4
 beq $t2, $t1, chooseWinner #if 4 in a row, last print so choose winner
@@ -127,9 +124,6 @@ addi $v0, $zero, 42
 syscall				#generates number from 0-6 and stores in $a0
 addi $a0, $a0, 1		#Sets the lower bound to 1 and upper bound to 8
 
-#addi $v0, $zero, 1
-#syscall
-
 jal FindColumn #value will be returned in $v1
 add $s5, $zero, $v1 #move returned value to $s5
 add $t4, $s5, $zero
@@ -140,31 +134,6 @@ addi $s1, $zero, 0		#sets the player turn to player
 add $s0, $a0, $zero
 j Loop2
 
-#TEST2
-chooseWinner:
-beq $a3, 1, p1Won   #if this space is a player place space the player (player 1) won
-j p2Won #else player 2 (the computer) won
+#TEST
+.include "ChooseWinner.asm"		#Links to file to choose which player won
 
-tiedGame: # no more empty space left in the board
-la $a0, tie #print game tied message
-li $v0, 4
-syscall
-li $v0, 10 #exiting the program 
-syscall
-
-p1Won:
-la $a0, p1Winner #print player 1 message 
-li $v0, 4
-syscall
-
-li $v0, 10 #exiting the program 
-syscall
-
-
-p2Won:
-la $a0, p2Winner #print player 2 message
-li $v0, 4
-syscall
-
-li $v0, 10 #exiting the program 
-syscall
